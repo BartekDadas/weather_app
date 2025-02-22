@@ -4,6 +4,7 @@ import '../config/di.dart';
 import '../cubits/weather_cubit.dart';
 import '../cubits/theme_cubit.dart';
 import '../widgets/location_permission_handler.dart';
+import '../widgets/city_search_bar.dart';
 import '../models/weather.dart';
 
 class MainScreen extends StatelessWidget {
@@ -27,11 +28,25 @@ class MainScreen extends StatelessWidget {
             ),
           ],
         ),
-        body: LocationPermissionHandler(
-          childBuilder: (state) => state.maybeWhen(
-            loaded: (weather) => _buildWeatherInfo(weather),
-            orElse: () => const SizedBox.shrink(),
-          ),
+        body: BlocBuilder<WeatherCubit, WeatherState>(
+          builder: (context, state) {
+            return Column(
+              children: [
+                if (state.maybeWhen(
+                  loaded: (_) => true,
+                  orElse: () => false,
+                )) const CitySearchBar(),
+                Expanded(
+                  child: LocationPermissionHandler(
+                    childBuilder: (state) => state.maybeWhen(
+                      loaded: (weather) => _buildWeatherInfo(weather),
+                      orElse: () => const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
     );
   }
