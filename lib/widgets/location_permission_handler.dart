@@ -3,28 +3,45 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/weather_cubit.dart';
 
 class LocationPermissionHandler extends StatelessWidget {
-  final Widget child;
+  final Widget Function(WeatherState) childBuilder;
 
   const LocationPermissionHandler({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
+    super.key,
+    required this.childBuilder,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WeatherCubit, WeatherState>(
       builder: (context, state) {
+        print(state);
         return state.when(
-          initial: () => _buildPermissionRequest(context),
+          initial: () => PermissionRequestWidget(
+            onPressed: () {
+              context.read<WeatherCubit>().getCurrentLocationWeather();
+            },
+          ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          loaded: (_) => child,
-          error: (error) => _buildError(context, error),
+          loaded: (_) => childBuilder(state),
+          error: (error) => ErrorWidget(error: error, onPressed: () {
+            context.read<WeatherCubit>().getCurrentLocationWeather();
+          }),
         );
       },
     );
   }
+}
 
-  Widget _buildPermissionRequest(BuildContext context) {
+class PermissionRequestWidget extends StatelessWidget {
+  const PermissionRequestWidget({
+    required this.onPressed,
+    super.key,
+  });
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -52,18 +69,29 @@ class LocationPermissionHandler extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {
-              context.read<WeatherCubit>().getCurrentLocationWeather();
-            },
+            onPressed: onPressed,
             child: const Text('Grant Permission'),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildError(BuildContext context, String error) {
-    return Center(
+
+class ErrorWidget extends StatelessWidget {
+  const ErrorWidget({
+    required this.error,
+    required this.onPressed,
+    super.key
+  });
+
+  final String error;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return  Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -80,9 +108,7 @@ class LocationPermissionHandler extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {
-              context.read<WeatherCubit>().getCurrentLocationWeather();
-            },
+            onPressed: onPressed,
             child: const Text('Try Again'),
           ),
         ],

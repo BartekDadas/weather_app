@@ -1,36 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../config/di.dart';
 import '../cubits/weather_cubit.dart';
+import '../cubits/theme_cubit.dart';
 import '../widgets/location_permission_handler.dart';
 import '../models/weather.dart';
 
 class MainScreen extends StatelessWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Weather App'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              context.read<WeatherCubit>().getCurrentLocationWeather();
-            },
-          ),
-        ],
-      ),
-      body: LocationPermissionHandler(
-        child: BlocBuilder<WeatherCubit, WeatherState>(
-          builder: (context, state) {
-            return state.maybeWhen(
-              loaded: (weather) => _buildWeatherInfo(weather),
-              orElse: () => const SizedBox.shrink(),
-            );
-          },
+        appBar: AppBar(
+          title: const Text('Weather App'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.brightness_6),
+              onPressed: () => _showThemeDialog(context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                context.read<WeatherCubit>().getCurrentLocationWeather();
+              },
+            ),
+          ],
         ),
-      ),
+        body: LocationPermissionHandler(
+          childBuilder: (state) => state.maybeWhen(
+            loaded: (weather) => _buildWeatherInfo(weather),
+            orElse: () => const SizedBox.shrink(),
+          ),
+        ),
     );
   }
 
@@ -57,10 +59,9 @@ class MainScreen extends StatelessWidget {
   }
 
   Widget _buildTemperatureSection(Weather weather) {
-    final description = weather.weather.isNotEmpty 
-        ? weather.weather.first.description 
-        : '';
-    
+    final description =
+        weather.weather.isNotEmpty ? weather.weather.first.description : '';
+
     return Center(
       child: Column(
         children: [
@@ -79,13 +80,34 @@ class MainScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            description,
-            style: const TextStyle(
-              fontSize: 24,
-              color: Colors.grey,
+          if (weather.weather.isNotEmpty) ...[
+            Image.network(
+              'https://openweathermap.org/img/wn/${weather.weather.first.icon}@2x.png',
+              width: 100,
+              height: 100,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.cloud_queue,
+                size: 100,
+              ),
             ),
-          ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              child: Text(
+                weather.weather.first.description,
+                key: ValueKey(weather.weather.first.description),
+                style: const TextStyle(
+                  fontSize: 24,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 8),
           Text(
             'H:${weather.main.maxTemp.round()}° L:${weather.main.minTemp.round()}°',
@@ -139,6 +161,44 @@ class MainScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Choose Theme'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Light'),
+              leading: const Icon(Icons.brightness_5),
+              onTap: () {
+                context.read<ThemesCubit>().setThemeMode(ThemesMode.light);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Dark'),
+              leading: const Icon(Icons.brightness_3),
+              onTap: () {
+                context.read<ThemesCubit>().setThemeMode(ThemesMode.dark);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Auto'),
+              leading: const Icon(Icons.brightness_auto),
+              onTap: () {
+                context.read<ThemesCubit>().setThemeMode(ThemesMode.auto);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
