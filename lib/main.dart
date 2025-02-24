@@ -11,7 +11,7 @@ import 'services/weather_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupDependencies();
+  await setupDependencies();
   await dotenv.load();
   runApp(const MyApp());
 }

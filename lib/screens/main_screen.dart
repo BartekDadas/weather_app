@@ -5,6 +5,7 @@ import '../cubits/weather_cubit.dart';
 import '../cubits/theme_cubit.dart';
 import '../widgets/location_permission_handler.dart';
 import '../widgets/city_search_bar.dart';
+import '../widgets/favorites_drawer.dart';
 import '../models/weather.dart';
 
 class MainScreen extends StatelessWidget {
@@ -16,6 +17,29 @@ class MainScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Weather App'),
           actions: [
+            BlocBuilder<WeatherCubit, WeatherState>(
+              builder: (context, state) {
+                return state.maybeWhen(
+                  loaded: (weather, favorites) {
+                    final isFavorite = favorites.contains(weather.cityName);
+                    return IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : null,
+                      ),
+                      onPressed: () {
+                        if (isFavorite) {
+                          context.read<WeatherCubit>().removeFromFavorites(weather.cityName);
+                        } else {
+                          context.read<WeatherCubit>().addToFavorites(weather.cityName);
+                        }
+                      },
+                    );
+                  },
+                  orElse: () => const SizedBox.shrink(),
+                );
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.brightness_6),
               onPressed: () => _showThemeDialog(context),
@@ -28,18 +52,19 @@ class MainScreen extends StatelessWidget {
             ),
           ],
         ),
+        drawer: const FavoritesDrawer(),
         body: BlocBuilder<WeatherCubit, WeatherState>(
           builder: (context, state) {
             return Column(
               children: [
                 if (state.maybeWhen(
-                  loaded: (_) => true,
+                  loaded: (_, __) => true,
                   orElse: () => false,
                 )) const CitySearchBar(),
                 Expanded(
                   child: LocationPermissionHandler(
                     childBuilder: (state) => state.maybeWhen(
-                      loaded: (weather) => _buildWeatherInfo(weather),
+                      loaded: (weather, _) => _buildWeatherInfo(weather),
                       orElse: () => const SizedBox.shrink(),
                     ),
                   ),

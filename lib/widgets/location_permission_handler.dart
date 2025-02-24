@@ -16,14 +16,14 @@ class LocationPermissionHandler extends StatelessWidget {
       builder: (context, state) {
         print(state);
         return state.when(
-          initial: () => PermissionRequestWidget(
+          initial: (_) => PermissionRequestWidget(
             onPressed: () {
               context.read<WeatherCubit>().getCurrentLocationWeather();
             },
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          loaded: (_) => childBuilder(state),
-          error: (error) => ErrorWidget(error: error, onPressed: () {
+          loading: (_) => const Center(child: CircularProgressIndicator()),
+          loaded: (_, __) => childBuilder(state),
+          error: (error, _) => ErrorWidget(error: error, onPressed: () {
             context.read<WeatherCubit>().getCurrentLocationWeather();
           }),
         );
