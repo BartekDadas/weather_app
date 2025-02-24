@@ -2,6 +2,60 @@
 
 A Flutter weather application that shows current weather and forecast data based on user location or city search.
 
+# Images
+
+### IOS
+
+<img
+     src="https://drive.google.com/uc?export=view&id=1CMpA5-rcCtErGZna5akYzL_ju0rwtzjc" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+<img
+     src="https://drive.google.com/uc?export=view&id=1V47d0_RnQAeXHLd1lnTYCaKRw6yekgJo" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+<img
+     src="https://drive.google.com/uc?export=view&id=1I743hWmNRiJc8KiUKMRX-XUJ4bh_K7N3" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+<img
+     src="https://drive.google.com/uc?export=view&id=1jxAmfP663ujNr3qJ9EFKzFu4DNIUzPru" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+
+### Android
+
+<img
+     src="https://drive.google.com/uc?export=view&id=1Al0GWPAKzoDtRxH94BtQhOg-aEhFQkzZ" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+<img
+     src="https://drive.google.com/uc?export=view&id=1V-Yi4eg_X-xG1Of_p5xyMs22y0ZmiDzL" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+<img
+     src="https://drive.google.com/uc?export=view&id=1XCw0bu6deIU94OYWMVH_-MDkUco5SUAa" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+<img
+     src="https://drive.google.com/uc?export=view&id=1VqNqe_RYW574EuTQfB5PQ985om9sfxPk" 
+     alt="sample image"
+     style="display: block; margin-right: auto; margin-left: auto; width: 15%;
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"/>
+     
+[Video](https://drive.google.com/file/d/1eQgcXbj-mt7O2dBwEeAnY55OeHRzb73F/view)
+<video width="640" height="360" controls>
+  <source src="https://drive.google.com/uc?id=1eQgcXbj-mt7O2dBwEeAnY55OeHRzb73F" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ## Features
 
 - Current weather information
