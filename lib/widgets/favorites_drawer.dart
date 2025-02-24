@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_app/utils/const.dart';
 import '../cubits/weather_cubit.dart';
 
 class FavoritesDrawer extends StatelessWidget {
@@ -20,7 +21,7 @@ class FavoritesDrawer extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    'Favorite Locations',
+                    Constants.favoriteLocations,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -33,7 +34,7 @@ class FavoritesDrawer extends StatelessWidget {
                 const Expanded(
                   child: Center(
                     child: Text(
-                      'No favorite locations yet',
+                      Constants.noFavoriteLocations,
                       style: TextStyle(fontSize: 16),
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_app/utils/const.dart';
 import '../cubits/weather_cubit.dart';
 
 class LocationPermissionHandler extends StatelessWidget {
@@ -14,7 +15,6 @@ class LocationPermissionHandler extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<WeatherCubit, WeatherState>(
       builder: (context, state) {
-        print(state);
         return state.when(
           initial: (_) => PermissionRequestWidget(
             onPressed: () {
@@ -53,7 +53,7 @@ class PermissionRequestWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Location Permission Required',
+            Constants.locationPermissionRequired,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -63,14 +63,14 @@ class PermissionRequestWidget extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 32),
             child: Text(
-              'We need access to your location to provide accurate weather information for your area.',
+              Constants.locationPermissionInfo,
               textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: onPressed,
-            child: const Text('Grant Permission'),
+            child: const Text(Constants.grandPermission),
           ),
         ],
       ),
@@ -109,7 +109,7 @@ class ErrorWidget extends StatelessWidget {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: onPressed,
-            child: const Text('Try Again'),
+            child: const Text(Constants.tryAgain),
           ),
         ],
       ),

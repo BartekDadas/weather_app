@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/utils/const.dart';
 
 class ErrorView extends StatelessWidget {
   final String message;
@@ -34,7 +35,7 @@ class ErrorView extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: const Text(Constants.retry),
               ),
             ],
           ],

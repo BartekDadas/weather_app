@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../config/di.dart';
+import 'package:weather_app/utils/const.dart';
+import 'package:weather_app/widgets/weather_info.dart';
 import '../cubits/weather_cubit.dart';
 import '../cubits/theme_cubit.dart';
 import '../widgets/location_permission_handler.dart';
 import '../widgets/city_search_bar.dart';
 import '../widgets/favorites_drawer.dart';
-import '../models/weather.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -14,193 +14,92 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Weather App'),
-          actions: [
-            BlocBuilder<WeatherCubit, WeatherState>(
-              builder: (context, state) {
-                return state.maybeWhen(
-                  loaded: (weather, favorites) {
-                    final isFavorite = favorites.contains(weather.cityName);
-                    return IconButton(
-                      icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.red : null,
-                      ),
-                      onPressed: () {
-                        if (isFavorite) {
-                          context.read<WeatherCubit>().removeFromFavorites(weather.cityName);
-                        } else {
-                          context.read<WeatherCubit>().addToFavorites(weather.cityName);
-                        }
-                      },
-                    );
-                  },
-                  orElse: () => const SizedBox.shrink(),
-                );
-              },
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: const Text(Constants.title,
+            style: TextStyle(fontWeight: FontWeight.w600,),),
+        actions: [
+          BlocBuilder<WeatherCubit, WeatherState>(
+            builder: (context, state) {
+              return state.maybeWhen(
+                loaded: (weather, favorites) {
+                  final isFavorite = favorites.contains(weather.cityName);
+                  return IconButton(
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : Colors.white,
+                    ),
+                    onPressed: () {
+                      if (isFavorite) {
+                        context
+                            .read<WeatherCubit>()
+                            .removeFromFavorites(weather.cityName);
+                      } else {
+                        context
+                            .read<WeatherCubit>()
+                            .addToFavorites(weather.cityName);
+                      }
+                    },
+                  );
+                },
+                orElse: () => const SizedBox.shrink(),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.brightness_6, color: Colors.white),
+            onPressed: () => _showThemeDialog(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              context.read<WeatherCubit>().getCurrentLocationWeather();
+            },
+          ),
+        ],
+      ),
+      drawer: const FavoritesDrawer(),
+      body: BlocBuilder<WeatherCubit, WeatherState>(
+        builder: (context, state) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1a1a2e)
+                      : const Color(0xFF4a90e2),
+                  Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF16213e)
+                      : const Color(0xFF87ceeb),
+                ],
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.brightness_6),
-              onPressed: () => _showThemeDialog(context),
-            ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () {
-                context.read<WeatherCubit>().getCurrentLocationWeather();
-              },
-            ),
-          ],
-        ),
-        drawer: const FavoritesDrawer(),
-        body: BlocBuilder<WeatherCubit, WeatherState>(
-          builder: (context, state) {
-            return Column(
+            child: Column(
               children: [
                 if (state.maybeWhen(
                   loaded: (_, __) => true,
                   orElse: () => false,
-                )) const CitySearchBar(),
+                ))
+                  const Padding(
+                    padding: EdgeInsets.only(top: 100, left: 16, right: 16),
+                    child: CitySearchBar(),
+                  ),
                 Expanded(
                   child: LocationPermissionHandler(
                     childBuilder: (state) => state.maybeWhen(
-                      loaded: (weather, _) => _buildWeatherInfo(weather),
+                      loaded: (weather, _) => WeatherInfo(weather: weather),
                       orElse: () => const SizedBox.shrink(),
                     ),
                   ),
                 ),
               ],
-            );
-          },
-        ),
-    );
-  }
-
-  Widget _buildWeatherInfo(Weather weather) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        // This will be handled by the cubit
-      },
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTemperatureSection(weather),
-              const SizedBox(height: 24),
-              _buildWeatherDetails(weather),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTemperatureSection(Weather weather) {
-    final description =
-        weather.weather.isNotEmpty ? weather.weather.first.description : '';
-
-    return Center(
-      child: Column(
-        children: [
-          Text(
-            weather.cityName,
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w500,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${weather.main.temperature.round()}°C',
-            style: const TextStyle(
-              fontSize: 72,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          if (weather.weather.isNotEmpty) ...[
-            Image.network(
-              'https://openweathermap.org/img/wn/${weather.weather.first.icon}@2x.png',
-              width: 100,
-              height: 100,
-              errorBuilder: (context, error, stackTrace) => const Icon(
-                Icons.cloud_queue,
-                size: 100,
-              ),
-            ),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-              child: Text(
-                weather.weather.first.description,
-                key: ValueKey(weather.weather.first.description),
-                style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(height: 8),
-          Text(
-            'H:${weather.main.maxTemp.round()}° L:${weather.main.minTemp.round()}°',
-            style: const TextStyle(
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeatherDetails(Weather weather) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Weather Details',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildDetailRow('Humidity', '${weather.main.humidity}%'),
-        _buildDetailRow('Pressure', '${weather.main.pressure} hPa'),
-        _buildDetailRow('Wind Speed', '${weather.wind.speed} m/s'),
-        _buildDetailRow('Wind Direction', '${weather.wind.deg}°'),
-      ],
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -209,12 +108,12 @@ class MainScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Choose Theme'),
+        title: const Text(Constants.changeMode),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text('Light'),
+              title: const Text(Constants.lightMode),
               leading: const Icon(Icons.brightness_5),
               onTap: () {
                 context.read<ThemesCubit>().setThemeMode(ThemesMode.light);
@@ -222,7 +121,7 @@ class MainScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('Dark'),
+              title: const Text(Constants.darkMode),
               leading: const Icon(Icons.brightness_3),
               onTap: () {
                 context.read<ThemesCubit>().setThemeMode(ThemesMode.dark);
@@ -230,7 +129,7 @@ class MainScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('Auto'),
+              title: const Text(Constants.autoMode),
               leading: const Icon(Icons.brightness_auto),
               onTap: () {
                 context.read<ThemesCubit>().setThemeMode(ThemesMode.auto);

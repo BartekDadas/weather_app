@@ -33,13 +33,11 @@ class _CitySearchBarState extends State<CitySearchBar> {
   }
 
   void _onSearchChanged(String value) async {
-    print('Search text changed: $value');
     setState(() => _showSuggestions = true);
     await context.read<WeatherCubit>().updateCitySuggestions(value);
   }
 
   void _onCitySelected(CitySuggestion suggestion) {
-    print('City selected: ${suggestion.name}');
     _controller.text = suggestion.name;
     context.read<WeatherCubit>().getWeatherByLocation(
           suggestion.lat,
@@ -82,13 +80,9 @@ class _CitySearchBarState extends State<CitySearchBar> {
             BlocBuilder<WeatherCubit, WeatherState>(
               builder: (context, state) {
                 final suggestions = context.read<WeatherCubit>().currentSuggestions;
-                print('Building suggestions list. Count: ${suggestions.length}');
-                
                 if (suggestions.isEmpty) {
-                  print('No suggestions available');
                   return const SizedBox.shrink();
                 }
-
                 return Material(
                   elevation: 8,
                   borderRadius: BorderRadius.circular(8),
